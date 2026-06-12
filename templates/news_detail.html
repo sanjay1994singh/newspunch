@@ -241,35 +241,6 @@
 <!-- Schema -->
 {% block js %}
 
-<script type="application/ld+json">
-
-
-    {
-        "@context": "https://schema.org",
-        "@type": "NewsArticle",
-        "headline": "{{ news.title|escapejs }}",
-        "description": "{{ news.short_description|escapejs }}",
-        "image": [
-            "{{ request.scheme }}://{{ request.get_host }}{{ news.image.url }}"
-        ],
-        "datePublished": "{{ news.created_at|date:'c' }}",
-        "dateModified": "{{ news.updated_at|date:'c' }}",
-        "author": {
-            "@type": "Person",
-            "name": "{{ news.author.username|default:'News Punch 24' }}"
-        },
-        "publisher": {
-            "@type": "Organization",
-            "name": "News Punch 24",
-            "logo": {
-                "@type": "ImageObject",
-                "url": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo.png' %}"
-            }
-        }
-    }
-
-
-</script>
 
 {% endblock js %}
 
