@@ -7,7 +7,7 @@
 
 {% block metatags %}
 <meta property="og:title" content="{{news.title}}">
-<meta property="og:description" content="{{ news.content|truncatewords:30 }}">
+<meta property="og:description" content="{{ news.meta_description|truncatewords:30 }}">
 <meta property="og:image" content="{{ absolute_image_url }}">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
 
