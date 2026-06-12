@@ -15,7 +15,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('news.urls')),
     path('category/', include('category.urls')),
-    path('ckeditor/', include('ckeditor_uploader.urls')),
+    path(
+        "ckeditor5/",
+        include("django_ckeditor_5.urls")
+    ),
 
 ]
 

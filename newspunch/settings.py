@@ -96,6 +96,30 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+CKEDITOR_5_CONFIGS = {
+
+    "default": {
+
+        "toolbar": [
+            "heading",
+            "|",
+            "bold",
+            "italic",
+            "link",
+            "bulletedList",
+            "numberedList",
+            "blockQuote",
+            "imageUpload",
+            "insertTable",
+            "mediaEmbed",
+            "undo",
+            "redo"
+        ],
+
+    }
+
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
