@@ -1,0 +1,470 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>
+        {% block title %}
+        News Punch 24 | Latest Hindi News
+        {% endblock %}
+    </title>
+
+
+    {% block metatags %}
+
+    <!-- Primary SEO -->
+
+    <meta name="description"
+          content="{% block meta_description %}News Punch 24 brings you latest Hindi news, breaking news, India news, politics, sports, entertainment and live updates. Get fast and reliable news updates daily.{% endblock %}">
+
+
+    <meta name="keywords"
+          content="News Punch 24, Latest News Hindi, Breaking News Hindi, India News, Hindi Samachar, Today News, Live News, National News, Politics News, Sports News, Entertainment News, Viral News">
+
+
+    <meta name="author"
+          content="News Punch 24">
+
+
+    <meta name="language"
+          content="Hindi">
+
+
+    {% endblock metatags %}
+
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+          rel="stylesheet">
+
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700;900&display=swap"
+          rel="stylesheet">
+
+
+    <style>
+
+
+        body{
+
+        background:#f4f6fb;
+        font-family:'Noto Sans Devanagari',sans-serif;
+
+        }
+
+
+
+        .navbar{
+
+        background:#ffffff;
+        box-shadow:0 5px 25px rgba(0,0,0,.08);
+
+        }
+
+
+
+        .logo{
+
+        font-size:30px;
+        font-weight:900;
+        color:#d60000!important;
+
+        }
+
+
+
+        .live-btn{
+
+        background:#e00000;
+        color:white;
+        padding:7px 18px;
+        border-radius:30px;
+        font-weight:bold;
+
+        }
+
+
+
+        .nav-link{
+
+        font-weight:600;
+        margin-left:15px;
+
+        }
+
+
+
+        .breaking{
+
+        background:#c90000;
+        color:white;
+        overflow:hidden;
+
+        }
+
+
+
+        .breaking span{
+
+        font-weight:bold;
+
+        }
+
+
+
+        .hero{
+
+        height:430px;
+        border-radius:25px;
+        overflow:hidden;
+        background:
+
+        linear-gradient(
+        rgba(0,0,0,.4),
+        rgba(0,0,0,.8)
+        ),
+
+        url("{% static 'images/news-bg.jpg' %}");
+
+        background-size:cover;
+        background-position:center;
+
+        }
+
+
+
+        .card-news{
+
+        background:white;
+        border-radius:18px;
+        overflow:hidden;
+        transition:.3s;
+        height:100%;
+
+        }
+
+
+
+        .card-news:hover{
+
+        transform:translateY(-6px);
+        box-shadow:0 15px 30px #ddd;
+
+        }
+
+
+
+        .card-news img{
+
+        height:200px;
+        width:100%;
+        object-fit:cover;
+
+        }
+
+
+
+        .section-title{
+
+        font-size:28px;
+        font-weight:900;
+        border-left:6px solid #e00000;
+        padding-left:12px;
+        margin-top:40px;
+
+        }
+
+
+
+        .video-card{
+
+        background:#000;
+        border-radius:18px;
+        overflow:hidden;
+        color:white;
+
+        }
+
+
+
+        footer{
+
+        background:#101010;
+        color:white;
+        padding:60px 0;
+
+        }
+
+
+
+        footer a{
+
+        color:#ddd;
+        text-decoration:none;
+
+        }
+
+
+    </style>
+
+
+    {% block css %}
+
+    {% endblock css %}
+</head>
+
+
+<body>
+
+
+<!-- HEADER -->
+
+
+<nav class="navbar navbar-expand-lg sticky-top">
+
+
+    <div class="container">
+
+
+        <a class="navbar-brand logo"
+           href="{% url 'home' %}">
+
+            News Punch 24
+
+        </a>
+
+
+        <div class="d-flex align-items-center gap-3">
+
+
+            <a href="#"
+               class="live-btn">
+
+                <i class="fa fa-circle"></i>
+                LIVE TV
+
+            </a>
+
+
+            <button class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#menu">
+
+
+                <span class="navbar-toggler-icon"></span>
+
+
+            </button>
+
+
+        </div>
+
+
+        <div class="collapse navbar-collapse"
+             id="menu">
+
+
+            <ul class="navbar-nav ms-auto">
+
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       href="{% url 'home' %}">
+                        होम
+                    </a>
+                </li>
+
+
+                {% for category in menu_categories %}
+
+                <li class="nav-item">
+
+                    <a class="nav-link"
+                       href="{% url 'category_detail' category.slug %}">
+
+                        {{category.name}}
+
+                    </a>
+
+                </li>
+
+                {% endfor %}
+
+
+            </ul>
+
+
+        </div>
+
+
+    </div>
+
+
+</nav>
+
+
+<!-- BREAKING NEWS -->
+
+
+<div class="breaking py-2">
+
+
+    <div class="container">
+
+
+<span>
+
+🔴 BREAKING :
+
+</span>
+
+
+        <marquee>
+
+
+            {% if breaking_news %}
+
+
+            {% for news in breaking_news %}
+
+            {{news.title}}
+            &nbsp;&nbsp; | &nbsp;&nbsp;
+
+            {% endfor %}
+
+
+            {% else %}
+
+
+            आज की ताजा खबरें यहां पढ़ें
+
+
+            {% endif %}
+
+
+        </marquee>
+
+
+    </div>
+
+
+</div>
+
+
+{% block content %}
+
+{% endblock %}
+
+
+<!-- FOOTER -->
+
+
+<footer>
+
+
+    <div class="container">
+
+
+        <div class="row">
+
+
+            <div class="col-md-4">
+
+
+                <h3>
+                    News Punch 24
+                </h3>
+
+
+                <p>
+                    आपकी आवाज, आपकी खबर
+                </p>
+
+
+            </div>
+
+
+            <div class="col-md-4">
+
+
+                <h5>
+                    Categories
+                </h5>
+
+
+                <p>
+                    राजनीति
+                </p>
+
+
+                <p>
+                    खेल
+                </p>
+
+
+                <p>
+                    मनोरंजन
+                </p>
+
+
+            </div>
+
+
+            <div class="col-md-4">
+
+
+                <h5>
+                    Follow Us
+                </h5>
+
+
+                <p>
+                    Facebook
+                </p>
+
+
+                <p>
+                    Youtube
+                </p>
+
+
+            </div>
+
+
+        </div>
+
+
+        <hr>
+
+
+        <p class="text-center">
+
+            © {% now "Y" %} News Punch 24
+
+        </p>
+
+
+    </div>
+
+
+</footer>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block js %}
+{% endblock js %}
+
+</body>
+
+
+</html>
