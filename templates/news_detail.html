@@ -24,9 +24,8 @@
       content="{{ news.short_description }}">
 
 
-<meta property="og:image"
-      content="{{ request.scheme }}://{{ request.get_host }}{{ news.image.url }}">
-
+<meta property="og:image" content="{{ absolute_image_url }}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
 
 <meta property="og:type"
       content="article">
@@ -37,6 +36,7 @@
 
 
 {% endblock metatags %}
+
 
 {% block css %}
 <style>
