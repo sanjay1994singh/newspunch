@@ -25,6 +25,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
+    "ckeditor",
+    "ckeditor_uploader",
     'accounts',
     'category',
     'news',
@@ -117,3 +119,4 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 AUTH_USER_MODEL = 'accounts.User'
+CKEDITOR_UPLOAD_PATH = "uploads/"

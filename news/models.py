@@ -5,6 +5,8 @@ from django.urls import reverse
 from accounts.models import User
 import re
 from datetime import date
+from ckeditor_uploader.fields import RichTextUploadingField
+
 
 def hindi_slug(text):
     text = str(text).strip().lower()
@@ -36,8 +38,8 @@ class NewsArticle(models.Model):
 
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='news')
 
-    short_description = models.TextField()
-    content = models.TextField()
+    short_description = models.TextField(null=True, blank=True)
+    content = RichTextUploadingField()
 
     image = models.ImageField(upload_to='news/')
     created_at = models.DateTimeField(auto_now_add=True)

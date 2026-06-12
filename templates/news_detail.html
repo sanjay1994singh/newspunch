@@ -39,17 +39,84 @@
 {% endblock metatags %}
 
 {% block css %}
-    <style>
-        .share-links {
-            margin: 10px 0;
-        }
-        .share-links a {
-            text-decoration: none;
-            margin-right: 10px;
-            font-size: 24px;
-            color: #000;
-        }
-    </style>
+<style>
+    .share-links {
+        margin: 10px 0;
+    }
+    .share-links a {
+        text-decoration: none;
+        margin-right: 10px;
+        font-size: 24px;
+        color: #000;
+    }
+
+
+    .article-content {
+        font-size:18px;
+        line-height:1.8;
+        color:#222;
+    }
+
+
+    /* CKEditor images */
+
+    .article-content img {
+
+        max-width:100% !important;
+        height:auto !important;
+
+        display:block;
+
+        margin:20px auto;
+
+        border-radius:10px;
+
+    }
+
+
+
+    /* CKEditor tables */
+
+    .article-content table {
+
+        width:100%;
+        border-collapse:collapse;
+
+    }
+
+
+    .article-content iframe {
+
+        max-width:100%;
+    }
+
+
+
+    /* remove float issue */
+
+    .article-content p::after {
+
+        content:"";
+        display:block;
+        clear:both;
+
+    }
+
+    .article-content p{
+        text-align:justify;
+    }
+
+
+    .article-content h1,
+    .article-content h2,
+    .article-content h3{
+
+        font-weight:700;
+        margin-top:25px;
+
+    }
+
+</style>
 {% endblock css %}
 
 
@@ -138,7 +205,7 @@
 
                 <div class="article-content">
 
-                    {{ news.content|linebreaks }}
+                    {{ news.content|safe }}
 
                 </div>
 
@@ -243,7 +310,6 @@
 
 
 {% endblock js %}
-
 
 
 {% endblock %}
