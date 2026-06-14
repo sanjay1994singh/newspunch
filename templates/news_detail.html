@@ -1,36 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}{{ article.title|default:"News Detail" }} | NewsPunch{% endblock %}
+{% block title %}{{ news.title|default:"News Detail" }} | NewsPunch{% endblock %}
 
 {% block metatags %}
-<meta name="description" content="{{ article.meta_description|default:article.short_description|striptags|truncatechars:160 }}">
-<link rel="canonical" href="{{ article_url }}">
-<meta property="og:type" content="article">
-<meta property="og:locale" content="hi_IN">
-<meta property="og:site_name" content="NewsPunch">
-<meta property="og:title" content="{{ article.meta_title|default:article.title }}">
-<meta property="og:description" content="{{ article.meta_description|default:article.short_description|striptags|truncatechars:200 }}">
-<meta property="og:url" content="{{ article_url }}">
-{% if article.category %}
-<meta property="article:section" content="{{ article.category.name }}">
-{% endif %}
-<meta property="article:published_time" content="{{ article.created_at|date:'c' }}">
-<meta property="article:modified_time" content="{{ article.updated_at|date:'c' }}">
-{% if article_image_url %}
-<meta property="og:image" content="{{ article_image_url }}">
-<meta property="og:image:secure_url" content="{{ article_image_url }}">
-<meta property="og:image:alt" content="{{ article.title }}">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-{% endif %}
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{{ article.meta_title|default:article.title }}">
-<meta name="twitter:description" content="{{ article.meta_description|default:article.short_description|striptags|truncatechars:200 }}">
-<meta name="twitter:url" content="{{ article_url }}">
-{% if article_image_url %}
-<meta name="twitter:image" content="{{ article_image_url }}">
-<meta name="twitter:image:alt" content="{{ article.title }}">
-{% endif %}
+<meta name="description" content="{{ news.meta_description|default:news.short_description|striptags|truncatechars:160 }}">
 {% endblock metatags %}
 
 {% block extra_css %}
@@ -156,72 +129,6 @@
         font-weight: 900;
     }
 
-    .share-row {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
-        margin-top: 14px;
-    }
-
-    .share-link {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 40px;
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        padding: 8px 12px;
-        color: var(--muted);
-        font-size: 13px;
-        font-weight: 900;
-        font-family: inherit;
-        text-align: center;
-        cursor: pointer;
-    }
-
-    .share-link:hover {
-        border-color: var(--brand);
-        color: var(--brand);
-    }
-
-    .share-whatsapp {
-        background: #25d366;
-        border-color: #25d366;
-        color: #fff;
-    }
-
-    .share-facebook {
-        background: #1877f2;
-        border-color: #1877f2;
-        color: #fff;
-    }
-
-    .share-x {
-        background: #111827;
-        border-color: #111827;
-        color: #fff;
-    }
-
-    .share-telegram {
-        background: #229ed9;
-        border-color: #229ed9;
-        color: #fff;
-    }
-
-    .share-copy,
-    .share-print {
-        background: #f2f6fb;
-        color: var(--studio);
-    }
-
-    .share-whatsapp:hover,
-    .share-facebook:hover,
-    .share-x:hover,
-    .share-telegram:hover {
-        color: #fff;
-        filter: brightness(0.94);
-    }
-
     .related-list {
         display: grid;
         gap: 14px;
@@ -272,26 +179,26 @@
     <div class="container">
         <header class="detail-header">
             <p class="eyebrow">
-                {% if article.category %}
-                    <a href="{% url 'category_news' article.category.slug %}">{{ article.category.name }}</a>
+                {% if news.category %}
+                    <a href="{% url 'category_news' news.category.slug %}">{{ news.category.name }}</a>
                 {% else %}
                     News
                 {% endif %}
             </p>
-            <h1 class="detail-title">{{ article.title|default:"Story headline goes here" }}</h1>
+            <h1 class="detail-title">{{ news.title|default:"Story headline goes here" }}</h1>
             <p class="detail-summary">
-                {{ article.short_description|default:"A complete report with the key facts, background, and context readers need to understand the story." }}
+                {{ news.short_description|default:"A complete report with the key facts, background, and context readers need to understand the story." }}
             </p>
             <div class="meta" style="margin-top: 18px;">
-                <span>By {{ article.author.get_full_name|default:article.author|default:"NewsPunch Desk" }}</span>
-                <span>{{ article.created_at|date:"F d, Y" }}</span>
-                <span>{{ article.views }} views</span>
+                <span>By {{ news.author.get_full_name|default:news.author|default:"NewsPunch Desk" }}</span>
+                <span>{{ news.created_at|date:"F d, Y" }}</span>
+                <span>{{ news.views }} views</span>
             </div>
         </header>
 
         <div class="detail-media">
-            {% if article.image %}
-                <img src="{{ article.image.url }}" alt="{{ article.title }}">
+            {% if news.image %}
+                <img src="{{ news.image.url }}" alt="{{ news.title }}">
             {% endif %}
         </div>
     </div>
@@ -300,8 +207,8 @@
 <section class="section">
     <div class="container article-layout">
         <div class="story">
-            {% if article.content %}
-                {{ article.content|safe }}
+            {% if news.content %}
+                {{ news.content|safe }}
             {% else %}
                 <p>The newsroom is following this developing story closely, bringing together verified details, local reaction, and the wider context behind the latest update.</p>
                 <p>Officials, experts, and people affected by the issue say the next few days will be important as more information becomes available.</p>
@@ -313,23 +220,15 @@
         <aside class="sidebar" aria-label="Article sidebar">
             <section class="card author-box">
                 <p class="eyebrow">Reporter</p>
-                <h2 class="box-title">{{ article.author.get_full_name|default:article.author|default:"NewsPunch Desk" }}</h2>
+                <h2 class="box-title">{{ news.author.get_full_name|default:news.author|default:"NewsPunch Desk" }}</h2>
                 <p class="excerpt">Reporting with clear facts, useful context, and a sharp eye for the details readers need.</p>
-                <div class="share-row" aria-label="Share article">
-                    <a class="share-link share-whatsapp" href="{{ whatsapp_share_url }}" target="_blank" rel="noopener">WhatsApp</a>
-                    <a class="share-link share-facebook" href="{{ facebook_share_url }}" target="_blank" rel="noopener">Facebook</a>
-                    <a class="share-link share-x" href="{{ twitter_share_url }}" target="_blank" rel="noopener">X</a>
-                    <a class="share-link share-telegram" href="{{ telegram_share_url }}" target="_blank" rel="noopener">Telegram</a>
-                    <button class="share-link share-copy" type="button" data-copy-url="{{ article_display_url }}">Copy Link</button>
-                    <a class="share-link share-print" href="javascript:window.print()">Print</a>
-                </div>
             </section>
 
             <section class="card related-box">
                 <p class="eyebrow">More Stories</p>
                 <h2 class="box-title">Related news</h2>
                 <div class="related-list">
-                    {% for item in related_articles %}
+                    {% for item in related_news %}
                         <article class="related-item">
                             <div class="meta">
                                 {% if item.category %}
@@ -355,20 +254,4 @@
         </aside>
     </div>
 </section>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    document.querySelectorAll("[data-copy-url]").forEach((button) => {
-        button.addEventListener("click", async () => {
-            const url = button.dataset.copyUrl;
-            try {
-                await navigator.clipboard.writeText(url);
-                button.textContent = "Copied";
-            } catch (error) {
-                window.prompt("Copy this link", url);
-            }
-        });
-    });
-</script>
 {% endblock %}

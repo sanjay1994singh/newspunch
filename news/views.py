@@ -1,11 +1,6 @@
-from urllib.parse import quote, unquote, unquote_plus
-import re
-
 from django.core.paginator import Paginator
-from django.db.models import F, Q
-from django.http import Http404
+from django.db.models import F
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
 
 from category.models import Category
 
@@ -18,131 +13,6 @@ def _published_articles():
         .select_related("category", "author")
         .order_by("-created_at")
     )
-
-
-def _slug_candidates(slug):
-    values = []
-    current = str(slug or "").split("?", 1)[0].split("#", 1)[0].strip().strip("/")
-    current = current.replace("\\", "/").strip("/")
-
-    for _ in range(3):
-        for value in {current, unquote(current), unquote_plus(current)}:
-            value = value.strip().strip("/")
-            value = value.replace("\u2013", "-").replace("\u2014", "-")
-            value = value.replace("\u00a0", "-")
-            if value and value not in values:
-                values.append(value)
-
-        decoded = unquote(current)
-        if decoded == current:
-            break
-        current = decoded.strip().strip("/")
-
-    return values
-
-
-def _slug_without_date(slug):
-    return re.sub(r"^\d{4}-\d{2}-\d{2}-", "", slug or "")
-
-
-def _normalize_shared_slug(slug):
-    value = _slug_without_date(unquote_plus(str(slug or ""))).lower()
-    value = value.replace("\u2013", "-").replace("\u2014", "-")
-    value = value.replace("\u00a0", "-")
-    value = value.replace("\u0964", "").replace("\u0965", "")
-    value = value.replace("\u093c", "")
-    value = re.sub(r"[^\u0900-\u097fa-z0-9]+", "-", value)
-    value = re.sub(r"-+", "-", value)
-    return value.strip("-")
-
-
-def _get_shared_article(slug):
-    candidates = _slug_candidates(slug)
-    query = Q()
-
-    for candidate in candidates:
-        query |= Q(slug=candidate)
-        query |= Q(slug__iexact=candidate)
-
-    article = _published_articles().filter(query).first() if query else None
-    if article:
-        return article
-
-    suffix_query = Q()
-    for candidate in candidates:
-        suffix = _slug_without_date(candidate)
-        if suffix and suffix != candidate:
-            suffix_query |= Q(slug__endswith=suffix)
-            suffix_query |= Q(slug__iendswith=suffix)
-
-    article = _published_articles().filter(suffix_query).first() if suffix_query else None
-    if article:
-        return article
-
-    normalized_candidates = {
-        _normalize_shared_slug(candidate)
-        for candidate in candidates
-        if _normalize_shared_slug(candidate)
-    }
-    for article in _published_articles().only("id", "slug"):
-        article_slug = _normalize_shared_slug(article.slug)
-        if article_slug in normalized_candidates:
-            return article
-
-        for candidate in normalized_candidates:
-            if len(candidate) >= 18 and (candidate in article_slug or article_slug in candidate):
-                return article
-
-    title_words = [
-        word
-        for candidate in normalized_candidates
-        for word in candidate.split("-")
-        if len(word) >= 3
-    ]
-    if title_words:
-        title_query = Q()
-        for word in title_words[:6]:
-            title_query &= Q(slug__icontains=word)
-
-        article = _published_articles().filter(title_query).first()
-        if article:
-            return article
-
-    raise Http404("No published NewsArticle matches this shared URL.")
-
-
-def _share_article_url(request, article):
-    return request.build_absolute_uri(article.get_absolute_url())
-
-
-def _render_news_detail(request, article):
-    NewsArticle.objects.filter(pk=article.pk).update(views=F("views") + 1)
-    article.views += 1
-
-    related_articles = (
-        _published_articles()
-        .filter(category=article.category)
-        .exclude(pk=article.pk)[:4]
-    )
-
-    article_url = _share_article_url(request, article)
-    article_display_url = unquote(article_url)
-    article_image_url = request.build_absolute_uri(article.image.url) if article.image else ""
-    share_text = f"{article.title}\n{article_display_url}"
-
-    context = {
-        "article": article,
-        "article_url": article_url,
-        "article_display_url": article_display_url,
-        "article_image_url": article_image_url,
-        "whatsapp_share_url": f"https://api.whatsapp.com/send?text={quote(share_text)}",
-        "facebook_share_url": f"https://www.facebook.com/sharer/sharer.php?u={quote(article_url, safe='')}",
-        "twitter_share_url": f"https://twitter.com/intent/tweet?url={quote(article_url, safe='')}&text={quote(article.title)}",
-        "telegram_share_url": f"https://t.me/share/url?url={quote(article_url, safe='')}&text={quote(article.title)}",
-        "related_articles": related_articles,
-        "categories": Category.objects.all().order_by("name"),
-    }
-    return render(request, "news_detail.html", context)
 
 
 def home(request):
@@ -177,13 +47,40 @@ def home(request):
 
 
 def news_detail(request, slug):
-    article = _get_shared_article(slug)
-    return _render_news_detail(request, article)
+    news = get_object_or_404(
+        NewsArticle,
+        slug=slug,
+        status="published",
+    )
 
+    NewsArticle.objects.filter(pk=news.pk).update(views=F("views") + 1)
+    news.views += 1
 
-def news_detail_by_id(request, pk, slug=None):
-    article = get_object_or_404(_published_articles(), pk=pk)
-    return _render_news_detail(request, article)
+    related_news = (
+        NewsArticle.objects.filter(
+            category=news.category,
+            status="published",
+        )
+        .select_related("category", "author")
+        .exclude(id=news.id)[:6]
+    )
+
+    latest_news = (
+        NewsArticle.objects.filter(status="published")
+        .select_related("category", "author")
+        .exclude(id=news.id)[:6]
+    )
+
+    return render(
+        request,
+        "news_detail.html",
+        {
+            "news": news,
+            "related_news": related_news,
+            "latest_news": latest_news,
+            "categories": Category.objects.all().order_by("name"),
+        },
+    )
 
 
 def category_news(request, slug):
