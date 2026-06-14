@@ -71,11 +71,16 @@ def news_detail(request, slug):
         .exclude(id=news.id)[:6]
     )
 
+    absolute_image_url = ""
+    if news.image:
+        absolute_image_url = request.build_absolute_uri(news.image.url)
+
     return render(
         request,
         "news_detail.html",
         {
             "news": news,
+            "absolute_image_url": absolute_image_url,
             "related_news": related_news,
             "latest_news": latest_news,
             "categories": Category.objects.all().order_by("name"),

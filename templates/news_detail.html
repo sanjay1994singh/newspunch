@@ -3,10 +3,29 @@
 {% block title %}{{ news.title|default:"News Detail" }} | NewsPunch{% endblock %}
 
 {% block metatags %}
-<meta name="description" content="{{ news.meta_description|default:news.short_description|striptags|truncatechars:160 }}">
-{% endblock metatags %}
+<meta property="og:title" content="{{news.title}}">
+<meta property="og:description" content="{{ news.short_description|truncatewords:30 }}">
+<meta property="og:image" content="{{ absolute_image_url }}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
 
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ news.title }}">
+<meta name="twitter:image" content="{% if news.image %}{{ news.image.url }}{% endif %}">
+{% endblock metatags %}
 {% block extra_css %}
+
+<style>
+    .share-links {
+        margin: 10px 0;
+    }
+    .share-links a {
+        text-decoration: none;
+        margin-right: 10px;
+        font-size: 24px;
+        color: #000;
+    }
+</style>
+
 <style>
     .detail-hero {
         border-bottom: 1px solid var(--line);
@@ -180,14 +199,33 @@
         <header class="detail-header">
             <p class="eyebrow">
                 {% if news.category %}
-                    <a href="{% url 'category_news' news.category.slug %}">{{ news.category.name }}</a>
+                <a href="{% url 'category_news' news.category.slug %}">{{ news.category.name }}</a>
                 {% else %}
-                    News
+                News
                 {% endif %}
             </p>
             <h1 class="detail-title">{{ news.title|default:"Story headline goes here" }}</h1>
+
+            <!-- Social Share -->
+            <div class="share-links mb-4 d-flex align-items-center">
+                <span class="me-3 fw-bold">Share:</span>
+                <a href="https://wa.me/?text={{ news.title }} - {{ request.build_absolute_uri }}" target="_blank"
+                   class="me-3 text-success fs-5">
+                    <i class="bi bi-whatsapp"></i>
+                </a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
+                   target="_blank" class="me-3 text-primary fs-5">
+                    <i class="bi bi-facebook"></i>
+                </a>
+                <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ news.title }}"
+                   target="_blank" class="text-info fs-5">
+                    <i class="bi bi-twitter-x"></i>
+                </a>
+            </div>
+
             <p class="detail-summary">
-                {{ news.short_description|default:"A complete report with the key facts, background, and context readers need to understand the story." }}
+                {{ news.short_description|default:"A complete report with the key facts, background, and context readers
+                need to understand the story." }}
             </p>
             <div class="meta" style="margin-top: 18px;">
                 <span>By {{ news.author.get_full_name|default:news.author|default:"NewsPunch Desk" }}</span>
@@ -198,7 +236,7 @@
 
         <div class="detail-media">
             {% if news.image %}
-                <img src="{{ news.image.url }}" alt="{{ news.title }}">
+            <img src="{{ news.image.url }}" alt="{{ news.title }}">
             {% endif %}
         </div>
     </div>
@@ -208,12 +246,17 @@
     <div class="container article-layout">
         <div class="story">
             {% if news.content %}
-                {{ news.content|safe }}
+            {{ news.content|safe }}
             {% else %}
-                <p>The newsroom is following this developing story closely, bringing together verified details, local reaction, and the wider context behind the latest update.</p>
-                <p>Officials, experts, and people affected by the issue say the next few days will be important as more information becomes available.</p>
-                <blockquote>Strong detail pages help readers understand the story quickly and stay engaged through the end.</blockquote>
-                <p>NewsPunch will continue to update this report as the story moves forward and new confirmed information is released.</p>
+            <p>The newsroom is following this developing story closely, bringing together verified details, local
+                reaction, and the wider context behind the latest update.</p>
+            <p>Officials, experts, and people affected by the issue say the next few days will be important as more
+                information becomes available.</p>
+            <blockquote>Strong detail pages help readers understand the story quickly and stay engaged through the
+                end.
+            </blockquote>
+            <p>NewsPunch will continue to update this report as the story moves forward and new confirmed information is
+                released.</p>
             {% endif %}
         </div>
 
@@ -221,7 +264,8 @@
             <section class="card author-box">
                 <p class="eyebrow">Reporter</p>
                 <h2 class="box-title">{{ news.author.get_full_name|default:news.author|default:"NewsPunch Desk" }}</h2>
-                <p class="excerpt">Reporting with clear facts, useful context, and a sharp eye for the details readers need.</p>
+                <p class="excerpt">Reporting with clear facts, useful context, and a sharp eye for the details readers
+                    need.</p>
             </section>
 
             <section class="card related-box">
@@ -229,25 +273,26 @@
                 <h2 class="box-title">Related news</h2>
                 <div class="related-list">
                     {% for item in related_news %}
-                        <article class="related-item">
-                            <div class="meta">
-                                {% if item.category %}
-                                    <a class="tag" href="{% url 'category_news' item.category.slug %}">{{ item.category.name }}</a>
-                                {% else %}
-                                    <span class="tag">News</span>
-                                {% endif %}
-                            </div>
-                            <h3><a href="{{ item.get_absolute_url }}">{{ item.title }}</a></h3>
-                        </article>
+                    <article class="related-item">
+                        <div class="meta">
+                            {% if item.category %}
+                            <a class="tag" href="{% url 'category_news' item.category.slug %}">{{ item.category.name
+                                }}</a>
+                            {% else %}
+                            <span class="tag">News</span>
+                            {% endif %}
+                        </div>
+                        <h3><a href="{{ item.get_absolute_url }}">{{ item.title }}</a></h3>
+                    </article>
                     {% empty %}
-                        <article class="related-item">
-                            <div class="meta"><span class="tag">Latest</span></div>
-                            <h3>Latest developments connected to this report</h3>
-                        </article>
-                        <article class="related-item">
-                            <div class="meta"><span class="tag">Update</span></div>
-                            <h3>Keep readers moving to the next important story.</h3>
-                        </article>
+                    <article class="related-item">
+                        <div class="meta"><span class="tag">Latest</span></div>
+                        <h3>Latest developments connected to this report</h3>
+                    </article>
+                    <article class="related-item">
+                        <div class="meta"><span class="tag">Update</span></div>
+                        <h3>Keep readers moving to the next important story.</h3>
+                    </article>
                     {% endfor %}
                 </div>
             </section>
