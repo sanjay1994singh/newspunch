@@ -1,7 +1,9 @@
+from urllib.parse import quote, unquote, unquote_plus
+
 from django.core.paginator import Paginator
-from django.db.models import F
-from django.shortcuts import get_object_or_404, redirect, render
-from urllib.parse import quote, unquote
+from django.db.models import F, Q
+from django.http import Http404
+from django.shortcuts import get_object_or_404, render
 
 from category.models import Category
 
@@ -19,10 +21,15 @@ def _published_articles():
 def _slug_candidates(slug):
     values = []
     current = str(slug or "").split("?", 1)[0].split("#", 1)[0].strip().strip("/")
+    current = current.replace("\\", "/").strip("/")
 
     for _ in range(3):
-        if current and current not in values:
-            values.append(current)
+        for value in {current, unquote(current), unquote_plus(current)}:
+            value = value.strip().strip("/")
+            value = value.replace("\u2013", "-").replace("\u2014", "-")
+            value = value.replace("\u00a0", "-")
+            if value and value not in values:
+                values.append(value)
 
         decoded = unquote(current)
         if decoded == current:
@@ -34,16 +41,17 @@ def _slug_candidates(slug):
 
 def _get_shared_article(slug):
     candidates = _slug_candidates(slug)
-    article = (
-        _published_articles()
-        .filter(slug__in=candidates)
-        .first()
-    )
+    query = Q()
 
+    for candidate in candidates:
+        query |= Q(slug=candidate)
+        query |= Q(slug__iexact=candidate)
+
+    article = _published_articles().filter(query).first() if query else None
     if article:
         return article
 
-    return get_object_or_404(_published_articles(), slug=slug)
+    raise Http404("No published NewsArticle matches this shared URL.")
 
 
 def home(request):
@@ -79,9 +87,6 @@ def home(request):
 
 def news_detail(request, slug):
     article = _get_shared_article(slug)
-    canonical_path = article.get_absolute_url()
-    if request.path != canonical_path:
-        return redirect(canonical_path, permanent=True)
 
     NewsArticle.objects.filter(pk=article.pk).update(views=F("views") + 1)
     article.views += 1
