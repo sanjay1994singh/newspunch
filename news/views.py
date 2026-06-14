@@ -50,6 +50,7 @@ def _normalize_shared_slug(slug):
     value = value.replace("\u2013", "-").replace("\u2014", "-")
     value = value.replace("\u00a0", "-")
     value = value.replace("\u0964", "").replace("\u0965", "")
+    value = value.replace("\u093c", "")
     value = re.sub(r"[^\u0900-\u097fa-z0-9]+", "-", value)
     value = re.sub(r"-+", "-", value)
     return value.strip("-")
@@ -84,7 +85,27 @@ def _get_shared_article(slug):
         if _normalize_shared_slug(candidate)
     }
     for article in _published_articles().only("id", "slug"):
-        if _normalize_shared_slug(article.slug) in normalized_candidates:
+        article_slug = _normalize_shared_slug(article.slug)
+        if article_slug in normalized_candidates:
+            return article
+
+        for candidate in normalized_candidates:
+            if len(candidate) >= 18 and (candidate in article_slug or article_slug in candidate):
+                return article
+
+    title_words = [
+        word
+        for candidate in normalized_candidates
+        for word in candidate.split("-")
+        if len(word) >= 3
+    ]
+    if title_words:
+        title_query = Q()
+        for word in title_words[:6]:
+            title_query &= Q(slug__icontains=word)
+
+        article = _published_articles().filter(title_query).first()
+        if article:
             return article
 
     raise Http404("No published NewsArticle matches this shared URL.")
