@@ -1,6 +1,7 @@
 from django.core.paginator import Paginator
 from django.db.models import F
 from django.shortcuts import get_object_or_404, render
+from urllib.parse import quote, unquote
 
 from category.models import Category
 
@@ -61,12 +62,19 @@ def news_detail(request, slug):
         .exclude(pk=article.pk)[:4]
     )
     article_url = request.build_absolute_uri(article.get_absolute_url())
+    article_display_url = unquote(article_url)
     article_image_url = request.build_absolute_uri(article.image.url) if article.image else ""
+    share_text = f"{article.title}\n{article_display_url}"
 
     context = {
         "article": article,
         "article_url": article_url,
+        "article_display_url": article_display_url,
         "article_image_url": article_image_url,
+        "whatsapp_share_url": f"https://api.whatsapp.com/send?text={quote(share_text)}",
+        "facebook_share_url": f"https://www.facebook.com/sharer/sharer.php?u={quote(article_url, safe='')}",
+        "twitter_share_url": f"https://twitter.com/intent/tweet?url={quote(article_url, safe='')}&text={quote(article.title)}",
+        "telegram_share_url": f"https://t.me/share/url?url={quote(article_url, safe='')}&text={quote(article.title)}",
         "related_articles": related_articles,
         "categories": Category.objects.all().order_by("name"),
     }

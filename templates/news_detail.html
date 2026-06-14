@@ -13,6 +13,8 @@
 <meta property="og:image" content="{{ article_image_url }}">
 <meta property="og:image:secure_url" content="{{ article_image_url }}">
 <meta property="og:image:alt" content="{{ article.title }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 {% endif %}
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ article.meta_title|default:article.title }}">
@@ -305,11 +307,11 @@
                 <h2 class="box-title">{{ article.author.get_full_name|default:article.author|default:"NewsPunch Desk" }}</h2>
                 <p class="excerpt">Reporting with clear facts, useful context, and a sharp eye for the details readers need.</p>
                 <div class="share-row" aria-label="Share article">
-                    <a class="share-link share-whatsapp" href="https://api.whatsapp.com/send?text={{ article.title|urlencode }}%20{{ article_url|urlencode }}" target="_blank" rel="noopener">WhatsApp</a>
-                    <a class="share-link share-facebook" href="https://www.facebook.com/sharer/sharer.php?u={{ article_url|urlencode }}" target="_blank" rel="noopener">Facebook</a>
-                    <a class="share-link share-x" href="https://twitter.com/intent/tweet?url={{ article_url|urlencode }}&text={{ article.title|urlencode }}" target="_blank" rel="noopener">X</a>
-                    <a class="share-link share-telegram" href="https://t.me/share/url?url={{ article_url|urlencode }}&text={{ article.title|urlencode }}" target="_blank" rel="noopener">Telegram</a>
-                    <button class="share-link share-copy" type="button" data-copy-url="{{ article_url }}">Copy Link</button>
+                    <a class="share-link share-whatsapp" href="{{ whatsapp_share_url }}" target="_blank" rel="noopener">WhatsApp</a>
+                    <a class="share-link share-facebook" href="{{ facebook_share_url }}" target="_blank" rel="noopener">Facebook</a>
+                    <a class="share-link share-x" href="{{ twitter_share_url }}" target="_blank" rel="noopener">X</a>
+                    <a class="share-link share-telegram" href="{{ telegram_share_url }}" target="_blank" rel="noopener">Telegram</a>
+                    <button class="share-link share-copy" type="button" data-copy-url="{{ article_display_url }}">Copy Link</button>
                     <a class="share-link share-print" href="javascript:window.print()">Print</a>
                 </div>
             </section>
