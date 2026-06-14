@@ -1,355 +1,427 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+{% block title %}NewsPunch | Latest News{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero {
+        padding: 24px 0 18px;
+    }
+
+    .hero-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.7fr);
+        gap: 18px;
+        align-items: stretch;
+    }
+
+    .hero-feature {
+        display: grid;
+        min-height: 560px;
+        overflow: hidden;
+        border: 0;
+        border-radius: 14px;
+        background: var(--studio);
+        color: #fff;
+        box-shadow: var(--shadow);
+    }
+
+    .hero-feature > * {
+        grid-area: 1 / 1;
+    }
+
+    .hero-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.62;
+        transition: transform 500ms ease;
+    }
+
+    .hero-feature:hover .hero-image {
+        transform: scale(1.04);
+    }
+
+    .hero-fallback {
+        background:
+            radial-gradient(circle at 20% 20%, rgba(0, 166, 214, 0.42), transparent 28%),
+            linear-gradient(135deg, var(--studio), var(--brand) 54%, var(--studio-2));
+    }
+
+    .hero-content {
+        align-self: end;
+        max-width: 860px;
+        padding: clamp(26px, 5vw, 54px);
+    }
+
+    .hero-content .eyebrow {
+        color: #fff;
+    }
+
+    .hero-content .eyebrow::before {
+        background: var(--brand);
+    }
+
+    .hero-title {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        font-size: clamp(42px, 6.4vw, 78px);
+        font-weight: 950;
+        line-height: 0.94;
+        letter-spacing: -0.055em;
+    }
+
+    .hero-summary {
+        max-width: 660px;
+        margin: 18px 0 0;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 20px;
+    }
+
+    .briefing {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        border-top: 0;
+        background: transparent;
+    }
+
+    .briefing-item {
+        display: grid;
+        grid-template-columns: 104px minmax(0, 1fr);
+        gap: 14px;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-left: 5px solid var(--brand);
+        border-radius: 12px;
+        padding: 14px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.07);
+    }
+
+    .briefing-thumb {
+        aspect-ratio: 1;
+        overflow: hidden;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--accent), var(--gold));
+    }
+
+    .briefing-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .briefing-title {
+        margin: 5px 0 0;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        font-size: 19px;
+        font-weight: 900;
+        line-height: 1.14;
+        letter-spacing: -0.025em;
+    }
+
+    .section-heading {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 18px;
+        border-top: 0;
+        border-left: 7px solid var(--brand);
+        margin-bottom: 20px;
+        padding: 0 0 0 14px;
+    }
+
+    .section-heading h2 {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        font-size: clamp(30px, 4vw, 46px);
+        font-weight: 950;
+        line-height: 1;
+        letter-spacing: -0.04em;
+    }
+
+    .news-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .news-grid .article-card:first-child {
+        grid-column: span 2;
+        grid-row: span 2;
+    }
+
+    .news-grid .article-card:first-child .article-title {
+        font-size: clamp(34px, 4vw, 48px);
+    }
+
+    .news-grid .article-card:first-child .article-media {
+        aspect-ratio: 16 / 11;
+    }
+
+    .category-news {
+        display: grid;
+        gap: 32px;
+    }
+
+    .category-block {
+        border-top: 0;
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+        padding-top: 16px;
+        padding: 18px;
+    }
+
+    .category-block:first-child {
+        border-top: 0;
+        padding-top: 0;
+    }
+
+    .category-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 14px;
+    }
+
+    .category-head h3 {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        font-size: 34px;
+        font-weight: 950;
+        line-height: 1;
+        letter-spacing: -0.04em;
+    }
+
+    .category-link {
+        color: var(--brand);
+        font-weight: 900;
+    }
+
+    .category-grid {
+        display: grid;
+        grid-template-columns: 1.2fr repeat(2, minmax(0, 0.8fr));
+        gap: 16px;
+    }
+
+    .compact-card .article-media {
+        aspect-ratio: 16 / 9;
+    }
+
+    .compact-card .article-title {
+        font-size: 21px;
+    }
+
+    @media (max-width: 940px) {
+        .hero-grid,
+        .news-grid,
+        .category-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .news-grid .article-card:first-child {
+            grid-column: auto;
+            grid-row: auto;
+        }
+
+        .hero-feature {
+            min-height: 440px;
+        }
+    }
+
+    @media (max-width: 560px) {
+        .hero {
+            padding-top: 28px;
+        }
+
+        .hero-feature {
+            min-height: 390px;
+        }
+
+        .briefing-item {
+            grid-template-columns: 72px minmax(0, 1fr);
+        }
+
+        .category-head {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-
-
-<div class="container mt-4">
-
-
-    <!-- HERO -->
-
-    <div class="hero p-5">
-
-
-        <h1>
-            {{ latest_news.0.title }}
-        </h1>
-
-
-        <p>
-            {{ latest_news.0.short_description }}
-        </p>
-
-
-        <a href="{{ latest_news.0.get_absolute_url }}"
-           class="btn btn-danger">
-
-            Read Full Story
-
-        </a>
-
-
-    </div>
-
-
-    <!-- BREAKING -->
-
-    <h2 class="section-title mt-5">
-
-        Breaking News
-
-    </h2>
-
-
-    <div class="row">
-
-
-        {% for news in breaking_news %}
-
-
-        <div class="col-md-4 mb-3">
-
-
-            <div class="card-news">
-
-
-                <img
-                        src="{{news.image.url}}"
-                        class="w-100">
-
-
-                <div class="p-3">
-
-
-                    <h5>
-
-                        {{news.title}}
-
-                    </h5>
-
-
-                    <p>
-
-                        {{news.short_description|truncatechars:90}}
-
-                    </p>
-
-
-                </div>
-
-
-            </div>
-
-
-        </div>
-
-
-        {% empty %}
-
-        <p>
-            No Breaking News
-        </p>
-
-
-        {% endfor %}
-
-
-    </div>
-
-
-    <!-- LATEST -->
-
-    <h2 class="section-title mt-5">
-
-        लेटेस्ट न्यूज़
-
-    </h2>
-
-
-    <div class="row">
-
-
-        {% for news in latest_news %}
-
-
-        <div class="col-md-4 mb-4">
-
-
-            <div class="card-news">
-
-
-                <a href="{{news.get_absolute_url}}">
-
-
-                    <img
-                            src="{{news.image.url}}"
-                            class="w-100">
-
-
-                </a>
-
-
-                <div class="p-3">
-
-
-                    <h4>
-
-                        {{news.title}}
-
-                    </h4>
-
-
-                    <p>
-
-                        {{news.short_description|truncatechars:120}}
-
-                    </p>
-
-
-                    <small>
-
-                        {{news.created_at|date:"d M Y"}}
-
-                    </small>
-
-
-                </div>
-
-
-            </div>
-
-
-        </div>
-
-
-        {% endfor %}
-
-
-    </div>
-
-
-    <!-- LIVE TV -->
-
-    <h2 class="section-title mt-5">
-
-        Live TV
-
-    </h2>
-
-
-    <div class="row">
-
-
-        <div class="col-md-8">
-
-
-            <div class="ratio ratio-16x9">
-
-
-                <iframe
-
-                        src="YOUR_YOUTUBE_LIVE_URL"
-
-                        allowfullscreen>
-
-                </iframe>
-
-
-            </div>
-
-
-        </div>
-
-
-        <div class="col-md-4">
-
-
-            <div class="bg-white p-4 rounded shadow">
-
-
-                <h3>
-
-                    आज की बड़ी खबरें
-
-                </h3>
-
-
-                {% for news in latest_news|slice:":5" %}
-
-
-                <p>
-
-                    🔴 {{news.title}}
-
+<section class="hero">
+    <div class="container hero-grid">
+        <article class="hero-feature">
+            {% if featured_article.image %}
+                <img class="hero-image" src="{{ featured_article.image.url }}" alt="{{ featured_article.title }}">
+            {% else %}
+                <div class="hero-fallback"></div>
+            {% endif %}
+            <div class="hero-content">
+                <p class="eyebrow">
+                    {% if featured_article.category %}
+                        <a href="{% url 'category_news' featured_article.category.slug %}">{{ featured_article.category.name }}</a>
+                    {% else %}
+                        Breaking News
+                    {% endif %}
                 </p>
-
-
-                {% endfor %}
-
-
+                <h1 class="hero-title">
+                    {% if featured_article %}
+                        <a href="{{ featured_article.get_absolute_url }}">{{ featured_article.title }}</a>
+                    {% else %}
+                        News that lands fast, reads clean, and feels alive.
+                    {% endif %}
+                </h1>
+                <p class="hero-summary">
+                    {{ featured_article.short_description|default:"Build your newsroom around strong headlines, rich cards, and story pages that keep readers moving." }}
+                </p>
             </div>
+        </article>
 
+        <aside class="briefing" aria-label="Latest briefing">
+            {% for item in briefing_articles %}
+                <article class="card briefing-item">
+                    <a class="briefing-thumb" href="{{ item.get_absolute_url }}">
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" alt="{{ item.title }}">
+                        {% endif %}
+                    </a>
+                    <div>
+                        <div class="meta">
+                            {% if item.category %}
+                                <a class="tag" href="{% url 'category_news' item.category.slug %}">{{ item.category.name }}</a>
+                            {% else %}
+                                <span class="tag">News</span>
+                            {% endif %}
+                            <span>{{ item.created_at|date:"M d, Y" }}</span>
+                        </div>
+                        <h2 class="briefing-title">
+                            <a href="{{ item.get_absolute_url }}">{{ item.title }}</a>
+                        </h2>
+                    </div>
+                </article>
+            {% empty %}
+                <article class="card briefing-item">
+                    <div class="briefing-thumb"></div>
+                    <div>
+                        <div class="meta"><span class="tag">World</span><span>Today</span></div>
+                        <h2 class="briefing-title">Morning brief: the biggest updates readers need first.</h2>
+                    </div>
+                </article>
+                <article class="card briefing-item">
+                    <div class="briefing-thumb"></div>
+                    <div>
+                        <div class="meta"><span class="tag">Business</span><span>Today</span></div>
+                        <h2 class="briefing-title">Compact cards keep your homepage active.</h2>
+                    </div>
+                </article>
+                <article class="card briefing-item">
+                    <div class="briefing-thumb"></div>
+                    <div>
+                        <div class="meta"><span class="tag">Culture</span><span>Today</span></div>
+                        <h2 class="briefing-title">Readers can jump straight into important updates.</h2>
+                    </div>
+                </article>
+            {% endfor %}
+        </aside>
+    </div>
+</section>
 
+<section class="section">
+    <div class="container">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">Fresh Coverage</p>
+                <h2>Latest stories</h2>
+            </div>
         </div>
 
-
-    </div>
-
-
-    <!-- CATEGORY -->
-
-
-    <h2 class="section-title mt-5">
-
-        Category News
-
-    </h2>
-
-
-    {% for cat, news_list in category_news.items %}
-
-
-    <h3 class="mt-4">
-
-        {{cat}}
-
-    </h3>
-
-
-    <div class="row">
-
-
-        {% for news in news_list %}
-
-
-        <div class="col-md-3">
-
-
-            <div class="card-news">
-
-
-                <img
-                        src="{{news.image.url}}"
-                        class="w-100">
-
-
-                <div class="p-2">
-
-
-                    <b>
-
-                        {{news.title|truncatechars:45}}
-
-                    </b>
-
-
+        <div class="news-grid">
+            {% for article in latest_articles %}
+                <article class="card article-card">
+                    <a class="article-media" href="{{ article.get_absolute_url }}">
+                        {% if article.image %}
+                            <img src="{{ article.image.url }}" alt="{{ article.title }}">
+                        {% endif %}
+                    </a>
+                    <div class="article-body">
+                        <div class="meta">
+                            {% if article.category %}
+                                <a class="tag" href="{% url 'category_news' article.category.slug %}">{{ article.category.name }}</a>
+                            {% else %}
+                                <span class="tag">News</span>
+                            {% endif %}
+                            <span>{{ article.created_at|date:"M d, Y" }}</span>
+                        </div>
+                        <h3 class="article-title">
+                            <a href="{{ article.get_absolute_url }}">{{ article.title }}</a>
+                        </h3>
+                        <p class="excerpt">{{ article.short_description|truncatewords:24 }}</p>
+                        <a class="read-more" href="{{ article.get_absolute_url }}">Read story</a>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="empty-state">
+                    Latest stories are being prepared by the newsroom.
                 </div>
-
-
-            </div>
-
-
+            {% endfor %}
         </div>
 
-
-        {% endfor %}
-
-
     </div>
+</section>
 
-
-    {% endfor %}
-
-
-    <!-- TRENDING -->
-
-
-    <h2 class="section-title mt-5">
-
-        Trending Stories
-
-    </h2>
-
-
-    <div class="row p-5">
-
-
-        {% for news in trending_news %}
-
-
-        <div class="col-md-4">
-
-
-            <div class="card p-3 shadow">
-
-
-                <h5>
-
-                    🔥 {{news.title}}
-
-                </h5>
-
-
-                <span>
-
-                {{news.views}} Views
-
-                </span>
-
-
+<section class="section" id="category-news">
+    <div class="container">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">Category Wise</p>
+                <h2>News by category</h2>
             </div>
-
-
         </div>
 
-
-        {% endfor %}
-
-
+        <div class="category-news">
+            {% for section in category_sections %}
+                <section class="category-block">
+                    <div class="category-head">
+                        <h3>{{ section.category.name|default:section.category }}</h3>
+                        <a class="category-link" href="{% url 'category_news' section.category.slug %}">View all</a>
+                    </div>
+                    <div class="category-grid">
+                        {% for article in section.articles %}
+                            <article class="card article-card compact-card">
+                                <a class="article-media" href="{{ article.get_absolute_url }}">
+                                    {% if article.image %}
+                                        <img src="{{ article.image.url }}" alt="{{ article.title }}">
+                                    {% endif %}
+                                </a>
+                                <div class="article-body">
+                                    <div class="meta">
+                                        {% if article.category %}
+                                            <a class="tag" href="{% url 'category_news' article.category.slug %}">{{ article.category.name }}</a>
+                                        {% else %}
+                                            <span class="tag">{{ section.category }}</span>
+                                        {% endif %}
+                                        <span>{{ article.created_at|date:"M d, Y" }}</span>
+                                    </div>
+                                    <h3 class="article-title">
+                                        <a href="{{ article.get_absolute_url }}">{{ article.title }}</a>
+                                    </h3>
+                                    <p class="excerpt">{{ article.short_description|truncatewords:18 }}</p>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% empty %}
+                <div class="empty-state">Category-wise news will appear here after published articles are added.</div>
+            {% endfor %}
+        </div>
     </div>
-
-
-</div>
-
+</section>
 
 {% endblock %}

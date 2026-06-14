@@ -1,9 +1,7 @@
-from .models import Category
+from category.models import Category
 
 
-def common_data(request):
+def base_categories(request):
     return {
-
-        "menu_categories": Category.objects.all()
-
+        "base_categories": Category.objects.all().order_by("name"),
     }

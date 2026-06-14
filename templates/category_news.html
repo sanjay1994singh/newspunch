@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }} News | NewsPunch{% endblock %}
+
+{% block extra_css %}
+<style>
+    .category-hero {
+        border-bottom: 0;
+        background:
+            radial-gradient(circle at 85% 20%, rgba(0, 166, 214, 0.26), transparent 26%),
+            linear-gradient(135deg, var(--studio), var(--studio-2));
+        color: #fff;
+        padding: 48px 0 42px;
+        box-shadow: inset 0 -8px 0 var(--brand);
+    }
+
+    .category-hero .eyebrow,
+    .category-hero .lead {
+        color: rgba(255, 255, 255, 0.84);
+    }
+
+    .category-hero .eyebrow::before {
+        background: var(--brand);
+    }
+
+    .category-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 330px;
+        gap: 28px;
+        align-items: start;
+    }
+
+    .category-page-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .category-page-grid .article-card:first-child {
+        grid-column: span 2;
+    }
+
+    .category-page-grid .article-card:first-child .article-title {
+        font-size: clamp(32px, 4vw, 46px);
+    }
+
+    .category-page-grid .article-card:first-child .article-media {
+        aspect-ratio: 16 / 9;
+    }
+
+    .sidebar {
+        position: sticky;
+        top: 104px;
+        display: grid;
+        gap: 18px;
+    }
+
+    .side-box {
+        border-top: 0;
+        border-left: 5px solid var(--brand);
+        border-radius: 12px;
+        padding: 20px;
+    }
+
+    .side-title {
+        margin: 0 0 12px;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        font-size: 24px;
+        font-weight: 950;
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+    }
+
+    .side-list {
+        display: grid;
+        gap: 12px;
+    }
+
+    .side-link {
+        border-top: 1px solid var(--line);
+        padding-top: 12px;
+        color: var(--muted);
+        font-weight: 800;
+    }
+
+    .side-link:first-child {
+        border-top: 0;
+        padding-top: 0;
+    }
+
+    .side-link:hover {
+        color: var(--brand);
+    }
+
+    .pagination {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 26px;
+    }
+
+    .page-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 42px;
+        min-height: 42px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--surface);
+        color: var(--muted);
+        font-weight: 900;
+    }
+
+    .page-link.current,
+    .page-link:hover {
+        border-color: var(--brand);
+        background: var(--brand);
+        color: #fff;
+    }
+
+    @media (max-width: 980px) {
+        .category-layout,
+        .category-page-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .category-page-grid .article-card:first-child {
+            grid-column: auto;
+        }
+
+        .sidebar {
+            position: static;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="category-hero">
+    <div class="container">
+        <p class="eyebrow">Category</p>
+        <h1 class="page-title">{{ category.name }} News</h1>
+        <p class="lead">Latest {{ category.name|lower }} stories, updates, analysis, and explainers from NewsPunch.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container category-layout">
+        <div>
+            <div class="category-page-grid">
+                {% for article in articles %}
+                    <article class="card article-card">
+                        <a class="article-media" href="{{ article.get_absolute_url }}">
+                            {% if article.image %}
+                                <img src="{{ article.image.url }}" alt="{{ article.title }}">
+                            {% endif %}
+                        </a>
+                        <div class="article-body">
+                            <div class="meta">
+                                <a class="tag" href="{% url 'category_news' article.category.slug %}">{{ article.category.name }}</a>
+                                <span>{{ article.created_at|date:"M d, Y" }}</span>
+                            </div>
+                            <h2 class="article-title">
+                                <a href="{{ article.get_absolute_url }}">{{ article.title }}</a>
+                            </h2>
+                            <p class="excerpt">{{ article.short_description|truncatewords:24 }}</p>
+                            <a class="read-more" href="{{ article.get_absolute_url }}">Read story</a>
+                        </div>
+                    </article>
+                {% empty %}
+                    <div class="empty-state">
+                        No {{ category.name|lower }} articles have been published yet.
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% if page_obj.has_other_pages %}
+                <nav class="pagination" aria-label="Category news pagination">
+                    {% if page_obj.has_previous %}
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Prev</a>
+                    {% endif %}
+
+                    {% for number in page_obj.paginator.page_range %}
+                        {% if number == page_obj.number %}
+                            <span class="page-link current">{{ number }}</span>
+                        {% else %}
+                            <a class="page-link" href="?page={{ number }}">{{ number }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    {% endif %}
+                </nav>
+            {% endif %}
+        </div>
+
+        <aside class="sidebar" aria-label="Category sidebar">
+            <section class="card side-box">
+                <p class="eyebrow">Browse</p>
+                <h2 class="side-title">All categories</h2>
+                <div class="side-list">
+                    {% for item in categories %}
+                        <a class="side-link" href="{% url 'category_news' item.slug %}">{{ item.name }}</a>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="card side-box">
+                <p class="eyebrow">Popular</p>
+                <h2 class="side-title">Most read</h2>
+                <div class="side-list">
+                    {% for item in popular_articles %}
+                        <a class="side-link" href="{{ item.get_absolute_url }}">{{ item.title }}</a>
+                    {% empty %}
+                        <span class="side-link">Popular stories will appear here.</span>
+                    {% endfor %}
+                </div>
+            </section>
+        </aside>
+    </div>
+</section>
+{% endblock %}
