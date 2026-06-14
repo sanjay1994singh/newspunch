@@ -1,6 +1,6 @@
 from django.core.paginator import Paginator
 from django.db.models import F
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from urllib.parse import quote, unquote
 
 from category.models import Category
@@ -14,6 +14,36 @@ def _published_articles():
         .select_related("category", "author")
         .order_by("-created_at")
     )
+
+
+def _slug_candidates(slug):
+    values = []
+    current = str(slug or "").split("?", 1)[0].split("#", 1)[0].strip().strip("/")
+
+    for _ in range(3):
+        if current and current not in values:
+            values.append(current)
+
+        decoded = unquote(current)
+        if decoded == current:
+            break
+        current = decoded.strip().strip("/")
+
+    return values
+
+
+def _get_shared_article(slug):
+    candidates = _slug_candidates(slug)
+    article = (
+        _published_articles()
+        .filter(slug__in=candidates)
+        .first()
+    )
+
+    if article:
+        return article
+
+    return get_object_or_404(_published_articles(), slug=slug)
 
 
 def home(request):
@@ -48,10 +78,10 @@ def home(request):
 
 
 def news_detail(request, slug):
-    article = get_object_or_404(
-        _published_articles(),
-        slug=slug,
-    )
+    article = _get_shared_article(slug)
+    canonical_path = article.get_absolute_url()
+    if request.path != canonical_path:
+        return redirect(canonical_path, permanent=True)
 
     NewsArticle.objects.filter(pk=article.pk).update(views=F("views") + 1)
     article.views += 1
