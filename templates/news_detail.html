@@ -311,7 +311,7 @@
 
             <div class="share-panel" aria-label="Share this article">
                 <p class="share-label">Share story</p>
-                <span class="share-url">{{ share_url }}</span>
+                <span class="share-url d-none">{{ share_url }}</span>
                 <div class="share-actions">
                     <a class="share-button whatsapp" href="{{ whatsapp_share_url }}" target="_blank" rel="noopener noreferrer" aria-label="Share on WhatsApp">
                         <i class="bi bi-whatsapp"></i>
@@ -321,9 +321,6 @@
                     </a>
                     <a class="share-button x" href="{{ x_share_url }}" target="_blank" rel="noopener noreferrer" aria-label="Share on X">
                         <i class="bi bi-twitter-x"></i>
-                    </a>
-                    <a class="share-button copy" href="{{ copy_share_url }}" aria-label="Open short share link">
-                        <i class="bi bi-link-45deg"></i>
                     </a>
                 </div>
             </div>
