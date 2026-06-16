@@ -302,7 +302,7 @@
             </p>
             <h1 class="detail-title">{{ news.title|default:"Story headline goes here" }}</h1>
 
-            <p class="detail-summary">{{ news.short_description }}</p>
+            <p class="detail-summary" style="text-align: justify;">{{ news.short_description }}</p>
             <div class="meta" style="margin-top: 18px;">
                 <span>By {{ news.author.get_full_name|default:news.author|default:"NewsPunch Desk" }}</span>
                 <span>{{ news.created_at|date:"F d, Y" }}</span>
@@ -335,7 +335,7 @@
 
 <section class="section">
     <div class="container article-layout">
-        <div class="story">
+        <div class="story" style="text-align: justify;">
             {% if news.content %}
             {{ news.content|safe }}
             {% else %}
