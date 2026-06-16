@@ -537,7 +537,7 @@
             <div class="container ticker-inner">
                 <div class="ticker-links">
                     {% for category in base_categories %}
-                        <a href="{% url 'category_news' category.slug %}">{{ category.name }}</a>
+                        <a href="{% url 'category_news' category.slug %}">{{ category.name|upper }}</a>
                     {% empty %}
                         <span>Add categories from admin to fill this bar</span>
                     {% endfor %}
