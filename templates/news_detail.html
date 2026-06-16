@@ -118,21 +118,6 @@
         gap: 9px;
     }
 
-    .share-url {
-        flex: 1 1 220px;
-        min-width: 0;
-        overflow: hidden;
-        border: 1px solid rgba(16, 24, 40, 0.08);
-        border-radius: 999px;
-        background: #f8fafc;
-        color: #475467;
-        padding: 9px 12px;
-        font-size: 13px;
-        font-weight: 800;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
     .share-button {
         display: inline-flex;
         align-items: center;
@@ -320,7 +305,7 @@
 
             <div class="share-panel" aria-label="Share this article">
                 <p class="share-label">Share story</p>
-                <span class="share-url">{{ share_url }}</span>
+<!--                <span class="share-url">{{ share_url }}</span>-->
                 <div class="share-actions">
                     <a class="share-button whatsapp" href="{{ whatsapp_share_url }}" target="_blank" rel="noopener noreferrer" aria-label="Share on WhatsApp">
                         <i class="bi bi-whatsapp"></i>
