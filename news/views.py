@@ -106,9 +106,9 @@ def news_detail(request, category_slug, slug):
         absolute_image_url = request.build_absolute_uri(news.image.url)
 
     canonical_url = request.build_absolute_uri(news.get_absolute_url())
+    share_url = request.build_absolute_uri(news.get_share_url())
     description_source = news.meta_description or news.short_description or strip_tags(news.content)
-    share_text = f"{news.title} - {canonical_url}"
-    encoded_canonical_url = quote_plus(canonical_url)
+    share_text = f"{news.title} - {share_url}"
 
     return render(
         request,
@@ -125,20 +125,25 @@ def news_detail(request, category_slug, slug):
             "whatsapp_share_url": f"https://wa.me/?text={quote_plus(share_text)}",
             "facebook_share_url": (
                 "https://www.facebook.com/sharer/sharer.php?"
-                + urlencode({"u": canonical_url})
+                + urlencode({"u": share_url})
             ),
             "x_share_url": (
                 "https://twitter.com/intent/tweet?"
-                + urlencode({"url": canonical_url, "text": news.title})
+                + urlencode({"url": share_url, "text": news.title})
             ),
-            "copy_share_url": canonical_url,
-            "encoded_canonical_url": encoded_canonical_url,
+            "copy_share_url": share_url,
+            "share_url": share_url,
         },
     )
 
 
 def legacy_news_detail(request, slug):
     news = get_object_or_404(NewsArticle, slug=slug, status="published")
+    return redirect(news.get_absolute_url(), permanent=True)
+
+
+def news_share_redirect(request, pk):
+    news = get_object_or_404(NewsArticle, pk=pk, status="published")
     return redirect(news.get_absolute_url(), permanent=True)
 
 

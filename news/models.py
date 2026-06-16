@@ -96,5 +96,8 @@ class NewsArticle(models.Model):
             },
         )
 
+    def get_share_url(self):
+        return reverse("news_share_redirect", kwargs={"pk": self.pk})
+
     def __str__(self):
         return self.title
