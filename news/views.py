@@ -1,3 +1,5 @@
+from urllib.parse import quote_plus, urlencode
+
 from django.core.paginator import Paginator
 from django.db.models import F, Q
 from django.http import HttpResponse
@@ -105,6 +107,8 @@ def news_detail(request, category_slug, slug):
 
     canonical_url = request.build_absolute_uri(news.get_absolute_url())
     description_source = news.meta_description or news.short_description or strip_tags(news.content)
+    share_text = f"{news.title} - {canonical_url}"
+    encoded_canonical_url = quote_plus(canonical_url)
 
     return render(
         request,
@@ -118,6 +122,17 @@ def news_detail(request, category_slug, slug):
             "seo_title": news.meta_title or f"{news.title} | NewsPunch",
             "seo_description": Truncator(description_source).chars(155),
             "canonical_url": canonical_url,
+            "whatsapp_share_url": f"https://wa.me/?text={quote_plus(share_text)}",
+            "facebook_share_url": (
+                "https://www.facebook.com/sharer/sharer.php?"
+                + urlencode({"u": canonical_url})
+            ),
+            "x_share_url": (
+                "https://twitter.com/intent/tweet?"
+                + urlencode({"url": canonical_url, "text": news.title})
+            ),
+            "copy_share_url": canonical_url,
+            "encoded_canonical_url": encoded_canonical_url,
         },
     )
 

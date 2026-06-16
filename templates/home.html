@@ -271,14 +271,14 @@
 <section class="hero">
     <div class="container hero-grid">
         <article class="hero-feature">
-            {% if featured_article.image %}
+            {% if featured_article and featured_article.image %}
                 <img class="hero-image" src="{{ featured_article.image.url }}" alt="{{ featured_article.title }}">
             {% else %}
                 <div class="hero-fallback"></div>
             {% endif %}
             <div class="hero-content">
                 <p class="eyebrow">
-                    {% if featured_article.category %}
+                    {% if featured_article and featured_article.category %}
                         <a href="{% url 'category_news' featured_article.category.slug %}">{{ featured_article.category.name }}</a>
                     {% else %}
                         Breaking News

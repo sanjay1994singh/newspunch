@@ -38,25 +38,14 @@
   "publisher": {
     "@type": "Organization",
     "name": "NewsPunch"
-  }{% if absolute_image_url %},
-  "image": ["{{ absolute_image_url|escapejs }}"]{% endif %}
+  }
+  {% if absolute_image_url %},
+  "image": ["{{ absolute_image_url|escapejs }}"]
+  {% endif %}
 }
 </script>
 {% endblock metatags %}
 {% block extra_css %}
-
-<style>
-    .share-links {
-        margin: 10px 0;
-    }
-    .share-links a {
-        text-decoration: none;
-        margin-right: 10px;
-        font-size: 24px;
-        color: #000;
-    }
-</style>
-
 <style>
     .detail-hero {
         border-bottom: 1px solid var(--line);
@@ -98,6 +87,71 @@
 
     .detail-hero .eyebrow::before {
         background: var(--brand);
+    }
+
+    .share-panel {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+        max-width: 760px;
+        margin: 22px 0 0;
+        border: 1px solid rgba(215, 222, 234, 0.9);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.86);
+        padding: 12px;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+    }
+
+    .share-label {
+        margin: 0;
+        color: #344054;
+        font-size: 13px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .share-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+    }
+
+    .share-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border: 1px solid rgba(16, 24, 40, 0.08);
+        border-radius: 50%;
+        background: #fff;
+        color: #101828;
+        font-size: 20px;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+        transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease, color 160ms ease;
+    }
+
+    .share-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.14);
+    }
+
+    .share-button.whatsapp:hover {
+        background: #25d366;
+        color: #fff;
+    }
+
+    .share-button.facebook:hover {
+        background: #1877f2;
+        color: #fff;
+    }
+
+    .share-button.x:hover,
+    .share-button.copy:hover {
+        background: #101828;
+        color: #fff;
     }
 
     .detail-media {
@@ -220,6 +274,11 @@
         .story {
             font-size: 19px;
         }
+
+        .share-panel {
+            align-items: flex-start;
+            flex-direction: column;
+        }
     }
 </style>
 {% endblock %}
@@ -237,28 +296,29 @@
             </p>
             <h1 class="detail-title">{{ news.title|default:"Story headline goes here" }}</h1>
 
-            <!-- Social Share -->
-            <div class="share-links mb-4 d-flex align-items-center">
-                <span class="me-3 fw-bold">Share:</span>
-                <a href="https://wa.me/?text={{ news.title }} - {{ request.build_absolute_uri }}" target="_blank"
-                   class="me-3 text-success fs-5">
-                    <i class="bi bi-whatsapp"></i>
-                </a>
-                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
-                   target="_blank" class="me-3 text-primary fs-5">
-                    <i class="bi bi-facebook"></i>
-                </a>
-                <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ news.title }}"
-                   target="_blank" class="text-info fs-5">
-                    <i class="bi bi-twitter-x"></i>
-                </a>
-            </div>
-
             <p class="detail-summary">{{ news.short_description }}</p>
             <div class="meta" style="margin-top: 18px;">
                 <span>By {{ news.author.get_full_name|default:news.author|default:"NewsPunch Desk" }}</span>
                 <span>{{ news.created_at|date:"F d, Y" }}</span>
                 <span>{{ news.views }} views</span>
+            </div>
+
+            <div class="share-panel" aria-label="Share this article">
+                <p class="share-label">Share story</p>
+                <div class="share-actions">
+                    <a class="share-button whatsapp" href="{{ whatsapp_share_url }}" target="_blank" rel="noopener noreferrer" aria-label="Share on WhatsApp">
+                        <i class="bi bi-whatsapp"></i>
+                    </a>
+                    <a class="share-button facebook" href="{{ facebook_share_url }}" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+                    <a class="share-button x" href="{{ x_share_url }}" target="_blank" rel="noopener noreferrer" aria-label="Share on X">
+                        <i class="bi bi-twitter-x"></i>
+                    </a>
+                    <a class="share-button copy" href="{{ copy_share_url }}" aria-label="Open canonical article link">
+                        <i class="bi bi-link-45deg"></i>
+                    </a>
+                </div>
             </div>
         </header>
 
@@ -304,8 +364,7 @@
                     <article class="related-item">
                         <div class="meta">
                             {% if item.category %}
-                            <a class="tag" href="{% url 'category_news' item.category.slug %}">{{ item.category.name
-                                }}</a>
+                            <a class="tag" href="{% url 'category_news' item.category.slug %}">{{ item.category.name }}</a>
                             {% else %}
                             <span class="tag">News</span>
                             {% endif %}
