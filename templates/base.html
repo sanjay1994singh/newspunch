@@ -72,7 +72,6 @@
         }
 
         .site-header {
-            position: sticky;
             top: 0;
             z-index: 20;
             border-bottom: 0;
@@ -500,11 +499,7 @@
                 <span class="brand-mark">NP</span>
                 <span>NewsPunch</span>
             </a>
-            <nav class="nav" aria-label="Primary navigation">
-                {% for category in base_categories %}
-                    <a href="{% url 'category_news' category.slug %}">{{ category.name }}</a>
-                {% endfor %}
-            </nav>
+
             <form class="header-actions" action="{% url 'home' %}" method="get">
                 <input class="search" type="search" name="q" value="{{ query|default:'' }}" placeholder="Search news" aria-label="Search news">
                 <button class="btn" type="submit">Search</button>
