@@ -3,13 +3,15 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.sitemaps.views import sitemap
-from news.sitemaps import NewsSitemap
+from news import views as news_views
+from news.sitemaps import CategorySitemap, NewsSitemap, StaticViewSitemap
 from news.google_news_sitemap import GoogleNewsSitemap
 from news.feeds import LatestNewsFeed
 
 sitemaps = {
+    "static": StaticViewSitemap,
+    "categories": CategorySitemap,
     "news": NewsSitemap,
-    "news-google": GoogleNewsSitemap,
 }
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -23,11 +25,21 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    path("rss.xml", LatestNewsFeed()),
+    path("rss.xml", LatestNewsFeed(), name="rss_feed"),
+    path("robots.txt", news_views.robots_txt, name="robots_txt"),
 ]
 
 urlpatterns += [
-    path("news-sitemap.xml", sitemap, {"sitemaps": {"news": GoogleNewsSitemap}}),
+    path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="django.contrib.sitemaps.views.sitemap"),
+    path(
+        "news-sitemap.xml",
+        sitemap,
+        {
+            "sitemaps": {"news": GoogleNewsSitemap},
+            "template_name": "sitemap_news.xml",
+        },
+        name="google_news_sitemap",
+    ),
 ]
 
 if settings.DEBUG:

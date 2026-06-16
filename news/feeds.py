@@ -3,9 +3,9 @@ from .models import NewsArticle
 
 
 class LatestNewsFeed(Feed):
-    title = "News Punch 24 Latest News"
+    title = "NewsPunch Latest News"
     link = "/"
-    description = "Latest breaking news from News Punch 24"
+    description = "Latest breaking news from NewsPunch"
 
     def items(self):
         return NewsArticle.objects.filter(status="published")[:20]

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}NewsPunch | Latest News{% endblock %}
+{% block title %}{{ seo_title|default:"NewsPunch | Latest News" }}{% endblock %}
 
 {% block extra_css %}
 <style>
